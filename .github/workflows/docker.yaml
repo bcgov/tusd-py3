@@ -1,0 +1,43 @@
+name: "Tusd Py3 Docker Image"
+on: 
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types:
+      - opened
+  release:
+    types: ['created']
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_DEPLOY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_DEPLOY_PASSWORD }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v2
+      - name: push to dockerhub
+        run: |
+          export BRANCH=${GITHUB_REF##*/}
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          echo "logged in, building now";
+
+          echo "Building Docker image..."
+          docker build -t bcgovimages/tusd_py3 .
+
+          docker tag bcgovimages/tusd_py3 bcgovimages/tusd_py3:latest
+          docker tag bcgovimages/tusd_py3 bcgovimages/tusd_py3:$BRANCH
+          docker tag bcgovimages/tusd_py3 bcgovimages/tusd_py3:$GITHUB_SHA
+          echo "tagged image as latest, $BRANCH and $GITHUB_SHA"
+          
+          docker push bcgovimages/tusd_py3:latest
+          docker push bcgovimages/tusd_py3:$BRANCH
+          docker push bcgovimages/tusd_py3:$GITHUB_SHA
+          echo "$BRANCH, latest and $GITHUB_SHA pushed successfully"

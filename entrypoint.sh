@@ -1,5 +1,3 @@
-echo "starting nginx"
-nginx -c /etc/nginx/nginx.conf
 echo "starting tusd"
 
 ENDARG="-s3-endpoint $S3_ENDPOINT"
