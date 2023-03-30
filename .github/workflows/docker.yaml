@@ -6,19 +6,6 @@ on:
   release:
     types: ['created']
 jobs:
-  preamble:
-    runs-on: ubuntu-latest
-    env:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_DEPLOY_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_DEPLOY_PASSWORD }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v3
-      - name: push to dockerhub
-        run: |
-          echo "Will build bcgovimages/tusd_py3 with $DOCKER_USERNAME"
   build:
     runs-on: ubuntu-latest
     env:
